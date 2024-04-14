@@ -1,0 +1,55 @@
+<!-- HTML za prikaz poslednjeg posta sa besplatnioglas.rs -->
+<div id="besplatnioglas-latest-post-container">
+    <a id="besplatnioglas-latest-post-link" href="#" target="_blank" style="display: block; text-align: center;">
+        <div style="position: relative; height: 200px; overflow: hidden;">
+            <img id="besplatnioglas-latest-post-image" src="#" alt="Latest Post Image" onclick="window.open(this.src)" style="position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); width: 100%;" />
+        </div>
+        <h2 id="besplatnioglas-latest-post-title" style="margin-top: 10px;">Latest Post Title</h2>
+    </a>
+</div>
+
+<style>
+#besplatnioglas-latest-post-container {
+    max-width: 100%;
+}
+
+#besplatnioglas-latest-post-title {
+    text-align: center;
+}
+
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+// Funkcija za dobijanje poslednjeg posta sa WordPress sajta besplatnioglas.rs
+function fetchBesplatnioglasLatestPost() {
+    // URL WordPress REST API-ja koji dobavlja poslednji post
+    var wordpressURL = "https://besplatnioglas.rs/wp-json/wp/v2/posts?per_page=1&_embed";
+
+    // Slanje AJAX zahteva ka WordPress REST API-ju
+    $.ajax({
+        url: wordpressURL,
+        dataType: 'json',
+        success: function(data) {
+            // Dobavljanje informacija o poslednjem postu
+            var latestPost = data[0];
+            var postTitle = latestPost.title.rendered;
+            var postImageURL = latestPost._embedded["wp:featuredmedia"][0].source_url;
+            var postURL = latestPost.link;
+
+            // Dekodiranje HTML entiteta u naslovu posta
+            postTitle = $('<textarea>').html(postTitle).text();
+
+            // Postavljanje slike, naslova i linka poslednjeg posta na Blogger blogu
+            $('#besplatnioglas-latest-post-image').attr('src', postImageURL).attr('onclick', "window.open('" + postURL + "')");
+            $('#besplatnioglas-latest-post-title').text(postTitle);
+            $('#besplatnioglas-latest-post-link').attr('href', postURL);
+        }
+    });
+}
+
+// Pozivanje funkcije za dobijanje poslednjeg posta kada se stranica učita
+$(document).ready(function() {
+    fetchBesplatnioglasLatestPost();
+});
+</script>
